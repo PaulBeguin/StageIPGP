@@ -41,7 +41,11 @@ class Glacier:
 # Initialisation des paramètres d'optimisation
 #   pas d'indice de bloc gardé pour affichage : Np_r
 #   pas d'indice de temps gardé pour affichage : Nt_r
+<<<<<<< HEAD
+    def __init__(self,rho_glace,rho_eau,H,alpha_glacier,g,E,Cw,m,ef,Np,Ltot,h_im):
+=======
     def __init__(self,rho_glace,rho_eau,H,alpha_glacier,g,E,Cw,m,ef,Np,Ltot,h_im,Np_r):
+>>>>>>> 891ea16fec04372fc3a038ee303b1d844175f6fe
         
         ## Paramètre de construction physique:
         # paramètres géométrique et physique élémentaires
@@ -74,12 +78,15 @@ class Glacier:
         self.h_im = h_im
         self.h_im_l = np.cos(self.alpha_glacier) * h_im * np.ones(self.Np+1) - np.sin(self.alpha_glacier) * self.l #profondeur d'immergement au frontière entre les blocs
         
+<<<<<<< HEAD
+=======
         ## Initialisation des paramètres d'optimisation géométrique
         self.Np_r = Np_r
         self.lp_plot = np.arange(0,self.Np,self.Np_r) #liste d'indice blocs
         self.Np_plot = len(self.lp_plot) #longueur réduite de bloc de liste
         self.L_plot = np.linspace(0,self.Ltot,self.Np_plot) #position des blocs à afficher
         
+>>>>>>> 891ea16fec04372fc3a038ee303b1d844175f6fe
         ## Construction of matrxi stiffness
         self.K_def() #enregistrement utile pour calcul de Fe
         
@@ -95,6 +102,10 @@ class Glacier:
         ## calcul of C damping linearized matrix at steady state
         self.C_lin_eq = self.C_lin_def(self.Ud_eq)
     
+<<<<<<< HEAD
+    ## stiffness matrix
+=======
+>>>>>>> 891ea16fec04372fc3a038ee303b1d844175f6fe
     def K_def(self):
         
         Ke = (self.E*self.H/self.dl) * np.array([[1,-1],[-1,1]])
@@ -350,7 +361,11 @@ def R_temps(Nt_,Nt_r_,Ttot):
     return(Nt_plot_,li_plot_,T_plot_)
 
 ## Fonction pour intégration temporelle et simulation
+<<<<<<< HEAD
+def simu(glacier,Fc,dt,Nt,Nt_r):
+=======
 def simu(glacier,Fc,dt,Nt,li_plot):
+>>>>>>> 891ea16fec04372fc3a038ee303b1d844175f6fe
     
     # définition des vecteurs de calcul et de l'état initial du système
     Ui = np.zeros(glacier.Np+1) # déplacement - nul
@@ -358,6 +373,14 @@ def simu(glacier,Fc,dt,Nt,li_plot):
     Fi = glacier.Fpertur(Fc[0]) # chargement - Fc[0]
     
     # définition du système optimisé - retourné et affiché
+<<<<<<< HEAD
+    Ut_plot = [[0 for k in range(glacier.Np+1)]] # displacement
+    Udt_plot = [[Udi[k] for k in range(glacier.Np+1)]] # vitesse affichée
+    Uddt_plot = [[0 for k in range(glacier.Np+1)]] # acceleration
+    Ftf_plot = [0] # force
+    Ftsismique_plot = [0] # force de frottement comparée au frottement statique
+    Ftsismique_map = [[0 for k in range(glacier.Np+1)]]
+=======
     Ut_plot = [] # déplacement affiché
     Udt_plot = [] # vitesse affichée
     Ftf_plot = [] # force de frottement affichée
@@ -365,6 +388,7 @@ def simu(glacier,Fc,dt,Nt,li_plot):
     Ftsismique_map = []
     Rm_plot = glacier.R_plot() # matrice de passage de Np dof à Np_plot déplacement affiché
     Rfm_plot = glacier.Rf_plot()
+>>>>>>> 891ea16fec04372fc3a038ee303b1d844175f6fe
     
     # matrice du problème
     M = glacier.M #masse
@@ -372,6 +396,29 @@ def simu(glacier,Fc,dt,Nt,li_plot):
     
     # Boucle temporelle - Nt-1 itérations pour obtenir longueur finale de Ui,Fi et Udi Nt
     print(" Début d'intégration temporelle \n Rang enregistré: ") #message pour suivi du calcul
+<<<<<<< HEAD
+    for i in range(Nt-1):
+        
+        # intégration de Verlet
+        Ui = Ui + dt*(Udi + (dt/2)*np.dot(M_inv,Fi))
+        Fi1 = glacier.Fe(Ui) + glacier.Ff(Udi) + glacier.Fpertur(Fc[i]) + glacier.P_xpoids
+        Udi = Udi + (dt/2)*np.dot(M_inv,(Fi + Fi1))
+
+        Fi = Fi1
+        
+        # enregistrement des données pour affichage
+        if i%Nt_r==0:
+            print(i) 
+        
+        Ut_plot.append( Ui )
+        Udt_plot.append( Udi )
+        Uddt_plot.append( Uddi )
+        Ftf_plot.append( np.sum(glacier.Ff(Udi)) )
+        Ftsismique_plot.append( np.sum(glacier.Ff(Udi)) + glacier.F_stat )
+        Ftsismique_map.append(glacier.Ff(Udi) + glacier.P_xpoids)
+        
+    return(np.array(Ut_plot), np.array(Udt_plot), np.array(Uddt_plot), np.array(Ftf_plot), np.array(Ftsismique_plot),np.array(Ftsismique_map),np.array(Niter_implicite))
+=======
     for i in range(Nt):
         
         # intégration de Verlet
@@ -397,6 +444,7 @@ def simu(glacier,Fc,dt,Nt,li_plot):
             Ftsismique_map.append(np.dot(Rfm_plot,(glacier.Ff(Udi) + glacier.P_xpoids)))
         
     return(np.array(Ut_plot), np.array(Udt_plot), np.array(Ftf_plot), np.array(Ftsismique_plot),np.array(Ftsismique_map))
+>>>>>>> 891ea16fec04372fc3a038ee303b1d844175f6fe
     
 ## Fonction pour intégration temporelle et simulation
 def simu_alpha(glacier,Fc,dt,Nt,alpha,eps,Nt_r):
