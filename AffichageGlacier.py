@@ -28,17 +28,10 @@ class Plot_figures :
         self.Nt_plot = len(self.Ut)
         self.T_plot = np.linspace(0,self.Ttot,self.Nt_plot)
         
-<<<<<<< HEAD
         self.U_axis = [0,self.Ttot,-3.5,0.5]
         self.Up_axis = [0,self.Ttot,-0.5,1]
         self.Ud_axis = [0,self.Ttot,-60,20]
         self.F_axis = [0,self.Ttot,-50,50]
-=======
-        self.U_axis = [0,self.Ttot,np.floor(self.Ut[-1][0]*1000),0.2]
-        self.Up_axis = [0,self.Ttot,-1,2]
-        self.Ud_axis = [0,self.Ttot,-20,10]
-        self.F_axis = [0,self.Ttot,-40,40] 
->>>>>>> 891ea16fec04372fc3a038ee303b1d844175f6fe
         
     
         self.get_Ut_max()
@@ -66,17 +59,10 @@ class Plot_figures :
         self.get_save_folder()
         
         self.get_perturbation_Ut()
-<<<<<<< HEAD
         # self.plot_displacement()
         # self.plot_speed()
         # self.plot_strains()
         # self.plot_Niter()
-=======
-        self.plot_displacement()
-        self.plot_speed()
-        self.plot_strains()
-        self.plot_Niter()
->>>>>>> 891ea16fec04372fc3a038ee303b1d844175f6fe
         
         # self.get_map()
         # self.map_displacement()
@@ -322,7 +308,6 @@ class Plot_figures :
         plt.ylabel('Position du bloc de glacier $(km)$')
         plt.title('Force sismique $(MN.m^{-1})$ dans le glacier en fonction du temps et de la position du bloc')
         plt.show()
-<<<<<<< HEAD
         fg6.savefig(name_fig6,bbox_inches=None)
 
 
@@ -534,15 +519,17 @@ class Plot_figure_dl_loop :
     def get_error(self):
         
         U_error_, Ud_error_, Fsis_error_ = [], [], []
+        
         for i in range(self.N_dl-1):
-            U_error_i_, Ud_error_i_, Fsis_error_i_ = 0, 0, 0
-            for k in range(self.Nt_plot-1):
-                U_error_i_+=(abs(self.U[i][k]-self.U[-1][k]) + abs(self.U[i][k+1]-self.U[-1][k+1]))/2
-                Ud_error_i_ +=(abs(self.Ud[i][k]-self.Ud[-1][k]) + abs(self.Ud[i][k+1]-self.Ud[-1][k+1]))/2
-                Fsis_error_i_ +=(abs((self.Fsis[i][k]/self.dl_list[i])-(self.Fsis[-1][k]/self.dl_list[-1])) + abs((self.Fsis[i][k+1]/self.dl_list[-1])-(self.Fsis[-1][k+1]/self.dl_list[-1])))/2
+            
+            U_error_i_ = np.trapz(np.abs(self.U[-1]-self.U[i]),self.T_plot)/self.Ttot
+            Ud_error_i_ = np.trapz(np.abs(self.Ud[-1]-self.Ud[i]),self.T_plot)/self.Ttot
+            Fsis_error_i_ = np.trapz(np.abs((self.Fsis[-1]/self.dl_list[-1])-(self.Fsis[i]/dl_list[i])),self.T_plot)/self.Ttot
+            
             U_error_.append(U_error_i_)
             Ud_error_.append(Ud_error_i_)
             Fsis_error_.append(Fsis_error_i_)
+        
         self.U_error = U_error_
         self.Ud_error = Ud_error_
         self.Fsis_error = Fsis_error_
@@ -584,6 +571,3 @@ class Plot_figure_dl_loop :
         plt.ylabel('$Fsis_{error}$ $e_{x}$ $(N.m^{-2})$')
         plt.draw()
         fg4.savefig(name_fig4,bbox_inches=None)
-=======
-        fg6.savefig(name_fig6,bbox_inches=None)
->>>>>>> 891ea16fec04372fc3a038ee303b1d844175f6fe
