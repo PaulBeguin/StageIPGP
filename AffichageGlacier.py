@@ -3,6 +3,8 @@
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
+from scipy.interpolate import interp2d
+import matplotlib.pyplot as mpl
 import numpy as np
 import os
 import shutil
@@ -50,21 +52,26 @@ class Plot_figures :
         self.Ud_max_plot = self.Ud_retour_plot
         self.F_max_plot = self.F_retour_plot
         
+        self.Ud_eq_plot = np.array([self.Utd[0][0],self.Utd[0][0]])
         self.Ud_reg_plot = np.array([self.ud_reg,self.ud_reg])
         self.Ud_reg_plot2 = np.array([-self.ud_reg,-self.ud_reg])
-        self.T_reg_plot = self.Ud_axis[0:2]
+        self.T_eq_plot = self.Ud_axis[0:2]
+        self.T_reg_plot = self.T_eq_plot
         
         self.get_label()
         
         self.get_save_folder()
         
         self.get_perturbation_Ut()
+        mpl.rcParams['figure.figsize'] = 35,18
+        
         # self.plot_displacement()
         # self.plot_speed()
         # self.plot_strains()
         # self.plot_Niter()
         
-        # self.get_map()
+        self.get_map()
+        self.get_perturbation_Ut()
         # self.map_displacement()
         # self.map_sismique()
     
@@ -128,6 +135,7 @@ class Plot_figures :
         self.label_list = label_list_
         
         label_list_Ud_ = self.label_list
+        label_list_Ud_.append("Vitesse d'équilibre")
         label_list_Ud_.append('Limite de rédularisation')
         self.label_list_Ud = label_list_Ud_
         
@@ -136,12 +144,12 @@ class Plot_figures :
     
     def get_save_folder(self):
         
-        os.chdir(self.save_path)
-        
-        if self.save_folder in os.listdir() :
-            shutil.rmtree(self.save_folder)
-            
-        os.makedirs(self.save_folder)
+        # os.chdir(self.save_path)
+        # 
+        # if self.save_folder in os.listdir() :
+        #     shutil.rmtree(self.save_folder)
+        #     
+        # os.makedirs(self.save_folder)
         os.chdir(self.save_path + '\\' + self.save_folder)
     
     
@@ -190,7 +198,7 @@ class Plot_figures :
         plt.ylabel('$U$ $e_{x}$ $(mm)$')
         plt.draw()
         
-        fg1.savefig(name_fig1, bbox_inches=None)
+        fg1.savefig(name_fig1+".svg")
     
     
     def plot_speed(self):
@@ -208,6 +216,7 @@ class Plot_figures :
         
         ax2.plot(self.T_max_plot , self.Ud_max_plot , 'k--',linewidth=3)  
         ax2.plot(self.T_retour_plot , self.Ud_retour_plot , 'k--',linewidth=1)
+        ax2.plot(self.T_eq_plot , self.Ud_eq_plot*1e+6 , 'g--', linewidth=2)
         ax2.plot(self.T_reg_plot , self.Ud_reg_plot*1e+6 , 'r--',linewidth=1)
         ax2.plot(self.T_reg_plot , self.Ud_reg_plot2*1e+6 , 'r--',linewidth=1)
         
@@ -219,7 +228,7 @@ class Plot_figures :
         plt.xlabel('Temps $(s)$')
         plt.ylabel('$\dot{U}$ $e_{x}$ $(\mu m.s^{-1})$')
         plt.draw()
-        fg2.savefig(name_fig2, bbox_inches=None)
+        fg2.savefig(name_fig2+'.svg')
     
     
     def plot_strains(self):
@@ -241,7 +250,7 @@ class Plot_figures :
         plt.xlabel('Temps $(s)$')
         plt.ylabel('Force $e_{x}$ $(MN.m^{-1})$')
         plt.draw()
-        fg3.savefig(name_fig3,bbox_inches=None)
+        fg3.savefig(name_fig3+'.svg')
     
     
     def plot_Niter(self):
@@ -257,7 +266,7 @@ class Plot_figures :
         plt.ylabel('$N_{iter}$')
         plt.grid(True)
         plt.draw()
-        fg4.savefig(name_fig4,bbox_inches=None)
+        fg4.savefig(name_fig4+'.svg')
     
     
     def get_map(self):
@@ -286,29 +295,52 @@ class Plot_figures :
         # cmap = plt.get_cmap('PiYG')
         # norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
         
-        im6 = ax6.pcolor(self.T_mesh,self.L_mesh,np.transpose(self.Ut)*1000)
+        im6 = ax6.pcolormesh(self.T_mesh,self.L_mesh,np.transpose(self.Utp)*1000,shading='gouraud')
+        
         fg6.colorbar(im6 , ax=ax6)
         plt.xlabel('Temps $(s)$')
         plt.ylabel('Position du bloc de glacier $(km)$')
         plt.title('Carte de la perturbation du déplacement $(mm)$ dans le glacier en fonction du temps et de la position du bloc')
         plt.show()
-        fg6.savefig(name_fig6,bbox_inches=None)
+        fg6.savefig(name_fig6+".svg")
+
+    def map_displacement2(self):
+        
+        name_fig8 = "MapDisplacement2"
+        fg8 = plt.figure(8)
+        ax8 = fg8.gca()
+        
+        f = interp2d(self.T_mesh,self.L_mesh,np.transpose(self.Utp)*1000,kind='cubic')
+        self.T_mesh2 = np.linspace(0,self.Ttot,self.Nt_plot)
+        self.L_mesh2 = np.linspace(0,self.Ltot,self.Np_plot)
+        
+        data1 = f(self.T_mesh2,self.L_mesh2)
+        X2, Y2 = np.meshgrid(self.T_mesh2,self.L_mesh2)
+
+        im8 = ax8.pcolormesh(X2, Y2, data1, cmap='RdBu')
+        fg8.colorbar(im8 , ax=ax8)
+        
+        plt.xlabel('Temps $(s)$')
+        plt.ylabel('Position du bloc de glacier $(km)$')
+        plt.title('Carte de la perturbation du déplacement $(mm)$ dans le glacier en fonction du temps et de la position du bloc')
+        plt.show()
+        fg8.savefig(name_fig8+".svg")
     
     
     def map_sismique(self):
         
-        name_fig6 = "MapSismique"
-        fg6 = plt.figure(6)
-        ax6 = fg6.gca()
+        name_fig7 = "MapSismique"
+        fg7 = plt.figure(7)
+        ax7 = fg7.gca()
         
-        im6 = ax6.pcolor(self.T_mesh,self.L_mesh*1e-3,np.transpose(self.Ftsismique_map)*1e-6)
-        plt.colorbar(im6 , ax=ax6)
+        im7 = ax7.pcolormesh(self.T_mesh,self.L_mesh*1e-3,np.transpose(self.Ftsismique_map)*1e-6,shading='gouraud')
+        plt.colorbar(im7 , ax=ax7)
         
         plt.xlabel('Temps $(s)$')
         plt.ylabel('Position du bloc de glacier $(km)$')
         plt.title('Force sismique $(MN.m^{-1})$ dans le glacier en fonction du temps et de la position du bloc')
         plt.show()
-        fg6.savefig(name_fig6,bbox_inches=None)
+        fg7.savefig(name_fig7+".svg")
 
 
 class Plot_figure_dl_loop :
@@ -408,12 +440,12 @@ class Plot_figure_dl_loop :
     
     def get_save_folder(self):
         
-        os.chdir(self.save_path)
-        
-        if self.save_folder in os.listdir() :
-            shutil.rmtree(self.save_folder)
-            
-        os.makedirs(self.save_folder)
+        # os.chdir(self.save_path)
+        # 
+        # if self.save_folder in os.listdir() :
+        #     shutil.rmtree(self.save_folder)
+        #     
+        # os.makedirs(self.save_folder)
         os.chdir(self.save_path + '\\' + self.save_folder)
     
     

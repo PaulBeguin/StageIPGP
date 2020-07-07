@@ -9,6 +9,7 @@
 ## import des modules utiles
 import numpy as np
 import os
+import time
 
 
 ## construction class Glacier pour initialisation des valeurs et fonctions
@@ -18,14 +19,14 @@ class Glacier:
 #   masse volumique glace : rho_glace [kg.m^-3]
 #   masse volumique eau : rho_eau [kg.m^-3]
 #   épaisseur du glacier : H [m]
-#   pente du glacier : alpha_glacier [deg]
+#   pente du glacier : alpha_ground [deg]
 #   accélaration de la pesanteur : g [m.s^-2]
 #   coeff de friction Weertman : Cw [Pa]
 #   coeff de friction Budd : Cb [Pa]
 #   coeff de friction Schoof : Cs [Pa]
 #   exposant de vitesse de glissement : m
 #   coeff de glissement max Schoof : Cmax [Pa]
-#   loi utilisée : type_law =0 Weertman, =1 Budd, =2 Schoof, =3 Coulomb
+#   loi utilisée : type_law =0 Weertman, =1 Tsai, =2 sans frottement
 
 # Lecture des fichiers utiles récupération des données
 #   nom du fichier avec liste temps T : T_filename
@@ -41,13 +42,14 @@ class Glacier:
 # Initialisation des paramètres d'optimisation
 #   pas d'indice de bloc gardé pour affichage : Np_r
 #   pas d'indice de temps gardé pour affichage : Nt_r
-    def __init__(self,rho_glace,rho_eau,H,alpha_glacier,g,E,Cw,m,Cc,type_law,ef,Np,Ltot,h_im):
+    def __init__(self,rho_glace,rho_eau,H,alpha_ground,alpha_surface,g,E,Cw,m,Cc,type_law,ef,Np,Ltot,h_im):
         
         ## Paramètre de construction physique:
         # paramètres géométrique et physique élémentaires
         self.rho_glace=rho_glace #masse volumique glace
         self.rho_eau=rho_eau #masse volumique eau
-        self.alpha_glacier=alpha_glacier #pente du glacier
+        self.alpha_ground=alpha_ground #pente du glacier
+        self.alpha_surface=alpha_surface
         self.g=g #accélération pesanteur
         self.E=E #module d'young de la glace
         
@@ -67,6 +69,7 @@ class Glacier:
         
         ## Setting of the glacier geometrie
         self.l_def()
+        self.H_def()
         
         ## Mass matrix and mass of the blocs array
         self.M_bloc_def()
@@ -74,7 +77,7 @@ class Glacier:
         
         # définition de l'immergement et pression effective
         self.h_im = h_im
-        self.h_im_l = np.cos(self.alpha_glacier) * h_im * np.ones(self.Np+1) - np.sin(self.alpha_glacier) * self.l #profondeur d'immergement au frontière entre les blocs
+        self.h_im_l = np.cos(self.alpha_ground) * h_im * np.ones(self.Np+1) - np.sin(self.alpha_ground) * self.l #profondeur d'immergement au frontière entre les blocs
         
         ## Construction of matrxi stiffness
         self.K_def() #enregistrement utile pour calcul de Fe
@@ -94,9 +97,9 @@ class Glacier:
     ## stiffness matrix
     def K_def(self):
         
-        Ke = (self.E*self.H/self.dl) * np.array([[1,-1],[-1,1]])
         K_ = np.zeros((self.Np+1,self.Np+1))
         for i in range(self.Np):
+            Ke = (self.E*self.H_l[i+1]/self.dl) * np.array([[1,-1],[-1,1]])
             K_[i:i+2,i:i+2] = K_[i:i+2,i:i+2] + Ke
         
         self.K = K_
@@ -120,14 +123,14 @@ class Glacier:
     ## pression poids composante normale au sol
     def P_zpoids_def(self):
         
-        P_zpoids_ = -np.cos(self.alpha_glacier) * self.g * self.M_bloc
+        P_zpoids_ = -np.cos(self.alpha_ground) * self.g * self.M_bloc
         
         self.P_zpoids = P_zpoids_
     
     ## pression poids composante tangentielle au sol - et valeur de frottement sur tout le glacier
     def P_xpoids_def(self):
         
-        P_xpoids_ = -np.sin(self.alpha_glacier) * self.g * self.M_bloc
+        P_xpoids_ = -np.sin(self.alpha_ground) * self.g * self.M_bloc
         self.F_stat = np.sum(P_xpoids_ )
         
         self.P_xpoids = P_xpoids_ 
@@ -176,12 +179,28 @@ class Glacier:
         self.l = l_
         self.dl_l = dl_l_
     
+    
+    ## Heigth of borders 
+    def H_def(self):
+        
+        Y_down_ = np.zeros(self.Np+2)
+        Y_up_ = np.zeros(self.Np+2)
+        
+        Y_down_[0] = 0
+        Y_up_[0] = self.H
+        for k in range(1,self.Np+2):
+            Y_down_[k] = np.sin(self.alpha_ground)*self.l[k-1]
+            Y_up_[k] = np.sin(self.alpha_surface)*self.l[k-1] + self.H
+        
+        H_ = Y_up_ - Y_down_
+        self.H_l = H_
+        
     ## Mass for each bloc function
     def M_bloc_def(self):
         
         M_bloc_ = np.zeros(self.Np+1)
         for k in range(self.Np+1):
-            M_bloc_[k] = self.H * self.rho_glace * self.dl_l[k]
+            M_bloc_[k] = (self.H_l[k]+self.H_l[k+1])/2 * self.rho_glace * self.dl_l[k]
         
         self.M_bloc = M_bloc_
     
@@ -367,6 +386,38 @@ def R_temps(Nt_,Nt_r_,Ttot):
     
     return(Nt_plot_,li_plot_,T_plot_)
 
+## research the excited file names and writing of a new one
+def create_file_result(glacier,results_path,theme_name):
+    
+    results_filename = "Results" + theme_name + "dl"+ str(int(glacier.dl))+ "Ltot" + str(int(glacier.Ltot/1000)) + "kmHHTtypelaw"+str(glacier.type_law)+".npz"
+    
+    os.chdir(results_path)
+    file_list = os.listdir(results_path)
+    
+    i = 2
+    while results_filename in file_list :
+        results_filename = "Results" + theme_name + "dl"+ str(int(glacier.dl))+ "Ltot" + str(int(glacier.Ltot/1000)) + "kmHHTtypelaw"+str(glacier.type_law) + "V" + str(i) +".npz"
+        i +=1
+    
+    return(results_filename)
+
+
+def create_folder_figure(glacier,save_figure_path,theme_name):
+    
+    os.chdir(save_figure_path)
+    folder_list = os.listdir(save_figure_path)
+    
+    date = time.asctime(time.localtime())[0:10]
+    save_folder_name = date + " " + theme_name
+    
+    i=2 
+    while save_folder_name in folder_list :
+        save_folder_name = date + " " + theme_name + " V" + str(i)
+        i +=1
+    
+    os.makedirs(save_folder_name)
+    return(save_folder_name)
+
 ## Fonction pour intégration temporelle et simulation
 def simu(glacier,Fc,dt,Nt,Nt_r):
     
@@ -397,6 +448,7 @@ def simu(glacier,Fc,dt,Nt,Nt_r):
         Udi = Udi + (dt/2)*np.dot(M_inv,(Fi + Fi1))
 
         Fi = Fi1
+        Udi[-1] = glacier.Ud_eq[-1]
         
         # enregistrement des données pour affichage
         if i%Nt_r==0:
@@ -461,12 +513,19 @@ def simu_alpha(glacier,Fc,dt,Nt,alpha,eps,Nt_r):
             P_nalpha_inter = glacier.Fpertur(Fc[n+1]) + glacier.P_xpoids + glacier.Fe(un_i)
             P_nalpha = P_nalpha_inter + glacier.Ff_law1(udn_i,P_nalpha_inter)
         
+        if glacier.type_law==2:
+            P_n = glacier.Fpertur(Fc[n]) + glacier.P_xpoids + glacier.Fe(Un)
+            
+            P_nalpha = glacier.Fpertur(Fc[n+1]) + glacier.P_xpoids + glacier.Fe(un_i)
+        
         r_i = p_alpha*(P_n) + p_alpha1*(P_nalpha) - np.dot(M,uddn_i)
         delta_uddn_i = np.dot(np.linalg.inv(Ms_i),r_i)
         
         un_i1 = un_i + uiai*delta_uddn_i
         udn_i1 = udn_i + udiai*delta_uddn_i
         uddn_i1 = uddn_i + delta_uddn_i
+        
+        udn_i1[-1] = glacier.Ud_eq[-1]
         
         i = 0
         
@@ -492,6 +551,8 @@ def simu_alpha(glacier,Fc,dt,Nt,alpha,eps,Nt_r):
             un_i1 = un_i + uiai*delta_uddn_i
             udn_i1 = udn_i + udiai*delta_uddn_i
             uddn_i1 = uddn_i + delta_uddn_i
+            
+            udn_i1[-1] = glacier.Ud_eq[-1]
             
             i +=1
 
