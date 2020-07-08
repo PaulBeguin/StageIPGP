@@ -10,6 +10,9 @@ import numpy as np
 import os
 import shutil
 
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+
 class Plot_figures :
     
     def __init__(self,file_name_,file_Fcname_,work_path_,file_path_,save_path_,save_folder_,lu_plot_,Ttot_,Ltot_,Fc_,ud_reg_):

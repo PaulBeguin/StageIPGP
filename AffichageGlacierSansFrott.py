@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 ## Class for plotting the results
 
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
@@ -9,6 +10,10 @@ import matplotlib.pyplot as mpl
 import numpy as np
 import os
 import shutil
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+matplotlib.rcParams['figure.figsize'] =10,7
+matplotlib.rcParams.update({'font.size': 40})
 
 class Plot_figures :
     
@@ -129,12 +134,12 @@ class Plot_figures :
         plt.legend(self.label_list,ncol=3)
         # plt.axis(self.U_axis)
         
-        plt.title('Déplacement total')
+        plt.title('Deplacement total')
         plt.grid(True)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('$U$ $e_{x}$ $(mm)$')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('$U_x$ (mm)')
         plt.draw()
-        
+        plt.tight_layout() 
         fg1.savefig(name_fig1+".svg")
     
     
@@ -158,9 +163,10 @@ class Plot_figures :
         
         plt.title('Vitesse de perturbation du glacier en fonction du temps')
         ax2.grid(True)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('$\dot{U}$ $e_{x}$ $(\mu m.s^{-1})$')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('$\dot{U}_x$ ($\mu$ m.s$^{-1}$)')
         plt.draw()
+	plt.tight_layout()
         fg2.savefig(name_fig2+'.svg')
     
     
@@ -192,11 +198,12 @@ class Plot_figures :
         
         ax4.plot(self.T_plot[:-1],self.Niter_implicite)
         
-        plt.title("Nombre d'itération à chaque pas de temps - schéma HHT")
-        plt.xlabel('Instant simulé - temps $(s)$')
+        plt.title("Nombre d'iteration a chaque pas de temps - schema HHT")
+        plt.xlabel('Instant simule - temps $t$ (s)')
         plt.ylabel('$N_{iter}$')
         plt.grid(True)
         plt.draw()
+	plt.tight_layout()
         fg4.savefig(name_fig4+'.svg')
     
     
@@ -215,10 +222,11 @@ class Plot_figures :
         im6 = ax6.pcolormesh(self.T_mesh,self.L_mesh,np.transpose(self.Ut)*1000,shading='gouraud')
         
         fg6.colorbar(im6 , ax=ax6)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('Position du bloc de glacier $(km)$')
-        plt.title('Carte de la perturbation du déplacement $(mm)$ dans le glacier en fonction du temps et de la position du bloc')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('Position du bloc de glacier $x$ (km)')
+        plt.title('Carte de la perturbation du deplacement $\Delta U_x$ (mm) dans le glacier en fonction du temps et de la position du bloc')
         plt.show()
+	plt.tight_layout()
         fg6.savefig(name_fig6+".svg")
     
     # 
