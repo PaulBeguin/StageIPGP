@@ -166,7 +166,7 @@ class Plot_figures :
         plt.xlabel('Temps $t$ (s)')
         plt.ylabel('$\dot{U}_x$ ($\mu$ m.s$^{-1}$)')
         plt.draw()
-	plt.tight_layout()
+        plt.tight_layout()
         fg2.savefig(name_fig2+'.svg')
     
     
@@ -203,7 +203,7 @@ class Plot_figures :
         plt.ylabel('$N_{iter}$')
         plt.grid(True)
         plt.draw()
-	plt.tight_layout()
+        plt.tight_layout()
         fg4.savefig(name_fig4+'.svg')
     
     
@@ -226,7 +226,7 @@ class Plot_figures :
         plt.ylabel('Position du bloc de glacier $x$ (km)')
         plt.title('Carte de la perturbation du deplacement $\Delta U_x$ (mm) dans le glacier en fonction du temps et de la position du bloc')
         #plt.show()
-	plt.tight_layout()
+        plt.tight_layout()
         fg6.savefig(name_fig6+".png")
     
      

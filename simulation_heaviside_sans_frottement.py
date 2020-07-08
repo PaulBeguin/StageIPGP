@@ -13,42 +13,20 @@ import time
 import os.path
 
 vypath = "/home/vyastreb/PEOPLE/Paul_BEGUIN/GIT/StageIPGP/tmp"
-PC = "VY" 
+PC = "PB" 
 
 if PC != "VY":
-	work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modèle SeismeGlacier sans frottement'
-	results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results Copy File Npz"
-	save_figure_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Figures Python'
+    work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modèle SeismeGlacier sans frottement'
+    results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results Copy File Npz"
+    save_figure_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Figures Python'
 else:
-	work_path = vypath
-	results_path = os.path.join(vypath,"results")
-	save_figure_path = os.path.join(vypath,"results")
+    work_path = vypath
+    results_path = os.path.join(vypath,"results")
+    save_figure_path = os.path.join(vypath,"results")
 
 os.chdir(work_path)
 import SeismeGlacierSansFrott as SeismeGlacier
 import AffichageGlacierSansFrott as AffichageGlacier
-
-
-# ========================= #
-#  Loading files T and Fc   #
-# ========================= #
-
-# work space and file name for Fc values
-Fc_filename = 'Fc_clear'
-
-# time array
-Ttot = 300 
-dt = 1
-Nt = int(Ttot/dt)
-T = np.linspace(0,Ttot,Nt)
-
-# force contact array
-Fc = np.ones(len(T))
-Fc[0] = 1/2 
-
-print("Durée du modèle simulé: " + str(Ttot) + "\n")
-print("Nombre de pas de temps: " + str(Nt) + "\n")
-print("Pas de temps:" + str(dt) + "\n")
 
 
 # ================== #
@@ -69,9 +47,35 @@ Ltot = 2000
 h_im = H * (rho_glace/rho_eau) * np.cos(alpha_ground)
 Np = 20
 
-
 # Appel class Glacier
 glacier = SeismeGlacier.Glacier(rho_glace,rho_eau,H,alpha_ground,alpha_surface,g,E,Np,Ltot,h_im)
+
+
+# ========================= #
+#  Loading files T and Fc   #
+# ========================= #
+
+# time array
+Ttot = 10
+w_elas = np.sqrt(glacier.E/glacier.rho_glace)/np.min(glacier.dl_l)
+T_elas = 2*np.pi/w_elas
+dt = T_elas/10
+Nt = int(Ttot/dt)
+T = np.linspace(0,Ttot,Nt)
+
+# force contact array
+# fc = 1 #test with Sinus 
+# Fc = np.sin(2*np.pi*fc*T)
+
+# Fc = np.zeros(len(T)) #test with Dirac
+# Fc[0] = 1 
+
+Fc = np.ones(len(T)) #test with Heaviside
+Fc[0] = 1/2
+
+print("Durée du modèle simulé: " + str(Ttot) + "\n")
+print("Nombre de pas de temps: " + str(Nt) + "\n")
+print("Pas de temps:" + str(dt) + "\n")
 
 # For computation process
 theme_name = "Heaviside"
@@ -98,7 +102,7 @@ print("Temps de calcul: " + "%.2f" % (t_end - t_start))
 
 # saving of the results
 np.savez(os.path.join(results_path,results_filename),Ut=Ut,Utd=Utd,Utdd=Utdd,Niter_implicite=Niter_implicite)
-	
+
 
 
 # ========================= #
@@ -118,5 +122,4 @@ affichage.plot_speed()
 affichage.plot_Niter()
 affichage.get_map()
 affichage.map_displacement()
-# affichage.map_displacement2()
 # affichage.map_sismique()
