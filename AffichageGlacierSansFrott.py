@@ -225,23 +225,23 @@ class Plot_figures :
         plt.xlabel('Temps $t$ (s)')
         plt.ylabel('Position du bloc de glacier $x$ (km)')
         plt.title('Carte de la perturbation du deplacement $\Delta U_x$ (mm) dans le glacier en fonction du temps et de la position du bloc')
-        plt.show()
+        #plt.show()
 	plt.tight_layout()
-        fg6.savefig(name_fig6+".svg")
+        fg6.savefig(name_fig6+".png")
     
-    # 
-    # def map_sismique(self):
-    #     
-    #     name_fig7 = "MapSismique"
-    #     fg7 = plt.figure(7)
-    #     ax7 = fg7.gca()
-    #     
-    #     im7 = ax7.pcolormesh(self.T_mesh,self.L_mesh*1e-3,np.transpose(self.Ftsismique_map)*1e-6,shading='gouraud')
-    #     plt.colorbar(im7 , ax=ax7)
-    #     
-    #     plt.xlabel('Temps $(s)$')
-    #     plt.ylabel('Position du bloc de glacier $(km)$')
-    #     plt.title('Force sismique $(MN.m^{-1})$ dans le glacier en fonction du temps et de la position du bloc')
-    #     plt.show()
-    #     fg7.savefig(name_fig7+".svg")
+     
+    def map_sismique(self):
+         
+        name_fig7 = "MapSismique"
+        fg7 = plt.figure(7)
+        ax7 = fg7.gca()
+         
+        im7 = ax7.pcolormesh(self.T_mesh,self.L_mesh*1e-3,np.transpose(self.Ftsismique_map)*1e-6,shading='gouraud')
+        plt.colorbar(im7 , ax=ax7)
+         
+        plt.xlabel('Temps $(s)$')
+        plt.ylabel('Position du bloc de glacier $(km)$')
+        plt.title('Force sismique $(MN.m^{-1})$ dans le glacier en fonction du temps et de la position du bloc')
+        #plt.show()
+        fg7.savefig(name_fig7+".png")
 

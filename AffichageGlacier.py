@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 ## Class for plotting the results
 
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
@@ -12,6 +13,8 @@ import shutil
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
+matplotlib.rcParams['figure.figsize'] =10,7
+matplotlib.rcParams.update({'font.size': 40})
 
 class Plot_figures :
     
@@ -178,8 +181,8 @@ class Plot_figures :
         
         plt.title('Déplacement total')
         plt.grid(True)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('$U$ $e_{x}$ $(mm)$')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('$U_x$ (mm)')
         plt.draw()
         
         plt.subplot(122)
@@ -196,10 +199,10 @@ class Plot_figures :
         plt.legend(self.label_list,ncol=3)
         plt.axis(self.Up_axis)
         
-        plt.title('Déplacement perturbé')
+        plt.title('Deplacement perturbe')
         plt.grid(True)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('$U$ $e_{x}$ $(mm)$')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('$U_x$ (mm)')
         plt.draw()
         
         fg1.savefig(name_fig1+".svg")
@@ -229,8 +232,8 @@ class Plot_figures :
         
         plt.title('Vitesse de perturbation du glacier en fonction du temps')
         ax2.grid(True)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('$\dot{U}$ $e_{x}$ $(\mu m.s^{-1})$')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('$\dot{U}_x$ ($\mu$ m.s$^{-1}$)')
         plt.draw()
         fg2.savefig(name_fig2+'.svg')
     
@@ -249,10 +252,10 @@ class Plot_figures :
         ax3.legend(self.label_list_F,ncol=2)
         ax3.axis(self.F_axis)
         
-        plt.title("Force de contact entre glacier et sol comparée a celle de l'iceberg sur le glacier")
+        plt.title("Force de contact entre glacier et sol comparee a celle de l'iceberg sur le glacier")
         ax3.grid(True)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('Force $e_{x}$ $(MN.m^{-1})$')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('Force $F_x$ (MN.m$^{-1}$)')
         plt.draw()
         fg3.savefig(name_fig3+'.svg')
     
@@ -265,8 +268,8 @@ class Plot_figures :
         
         ax4.plot(self.T_plot[:-1],self.Niter_implicite)
         
-        plt.title("Nombre d'itération à chaque pas de temps - schéma HHT")
-        plt.xlabel('Instant simulé - temps $(s)$')
+        plt.title("Nombre d'iterationa chaque pas de temps - schema HHT")
+        plt.xlabel('Instant simule - temps $t$ (s)')
         plt.ylabel('$N_{iter}$')
         plt.grid(True)
         plt.draw()
@@ -302,9 +305,9 @@ class Plot_figures :
         im6 = ax6.pcolormesh(self.T_mesh,self.L_mesh,np.transpose(self.Utp)*1000,shading='gouraud')
         
         fg6.colorbar(im6 , ax=ax6)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('Position du bloc de glacier $(km)$')
-        plt.title('Carte de la perturbation du déplacement $(mm)$ dans le glacier en fonction du temps et de la position du bloc')
+        plt.xlabel('Temps $r$ (s)')
+        plt.ylabel('Position du bloc de glacier $x$ (km)')
+        plt.title('Carte de la perturbation du déplacement(mm) dans le glacier en fonction du temps et de la position du bloc')
         plt.show()
         fg6.savefig(name_fig6+".svg")
 
@@ -324,9 +327,9 @@ class Plot_figures :
         im8 = ax8.pcolormesh(X2, Y2, data1, cmap='RdBu')
         fg8.colorbar(im8 , ax=ax8)
         
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('Position du bloc de glacier $(km)$')
-        plt.title('Carte de la perturbation du déplacement $(mm)$ dans le glacier en fonction du temps et de la position du bloc')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('Position du bloc de glacier $x$ (km)')
+        plt.title('Carte de la perturbation du deplacement(mm) dans le glacier en fonction du temps et de la position du bloc')
         plt.show()
         fg8.savefig(name_fig8+".svg")
     
@@ -340,9 +343,9 @@ class Plot_figures :
         im7 = ax7.pcolormesh(self.T_mesh,self.L_mesh*1e-3,np.transpose(self.Ftsismique_map)*1e-6,shading='gouraud')
         plt.colorbar(im7 , ax=ax7)
         
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('Position du bloc de glacier $(km)$')
-        plt.title('Force sismique $(MN.m^{-1})$ dans le glacier en fonction du temps et de la position du bloc')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('Position du bloc de glacier $x$ (km)')
+        plt.title('Force sismique (MN.m^${-1}$) dans le glacier en fonction du temps et de la position du bloc')
         plt.show()
         fg7.savefig(name_fig7+".svg")
 
@@ -471,10 +474,10 @@ class Plot_figure_dl_loop :
         plt.legend(self.label_list_U,ncol=3)
         plt.axis(self.U_axis)
         
-        plt.title('Déplacement total')
+        plt.title('Deplacement total')
         plt.grid(True)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('$U$ $e_{x}$ $(mm)$')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('$U_x$ (mm)')
         plt.draw()
         
         plt.subplot(122)
@@ -490,10 +493,10 @@ class Plot_figure_dl_loop :
         plt.legend(self.label_list_U,ncol=3)
         plt.axis(self.Up_axis)
         
-        plt.title('Déplacement perturbé')
+        plt.title('Deplacement perturbe')
         plt.grid(True)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('$U$ $e_{x}$ $(mm)$')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('$U_x$ (mm)')
         plt.draw()
         
         fg1.savefig(name_fig1, bbox_inches=None)
@@ -521,8 +524,8 @@ class Plot_figure_dl_loop :
         
         plt.title('Vitesse de perturbation du glacier en fonction du temps')
         ax2.grid(True)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('$\dot{U}$ $e_{x}$ $(\mu m.s^{-1})$')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('$\dot{U}_x$ ($\mu$ m.s$^{-1}$)')
         plt.draw()
         fg2.savefig(name_fig2, bbox_inches=None)
     
@@ -546,8 +549,8 @@ class Plot_figure_dl_loop :
         
         plt.title("Force de contact entre glacier et sol par longueur de bloc")
         ax3.grid(True)
-        plt.xlabel('Temps $(s)$')
-        plt.ylabel('Force $e_{x}$ $(kN.m^{-2})$')
+        plt.xlabel('Temps $t$ (s)')
+        plt.ylabel('Force $F_{x}$ (kN.m$^{-2}$)')
         plt.draw()
         fg3.savefig(name_fig3,bbox_inches=None)
     
@@ -581,10 +584,10 @@ class Plot_figure_dl_loop :
         plt.semilogx()
         plt.plot(self.dl_list[0:self.N_dl-1],self.U_error,'o--')
         plt.axis(self.U_error_axis)
-        plt.title('Erreur en déplacement')
+        plt.title('Erreur en deplacement')
         plt.grid(True)
-        plt.xlabel('$\delta_l $(m)$')
-        plt.ylabel('$U_{error}$ $e_{x}$ $(m)$')
+        plt.xlabel('$\delta_l$ (m)')
+        plt.ylabel('$U_{x_{error}}$ (m)')
         plt.draw()
         
         plt.subplot(132)
@@ -593,8 +596,8 @@ class Plot_figure_dl_loop :
         plt.axis(self.Ud_error_axis)
         plt.title('Erreur en vitesse')
         plt.grid(True)
-        plt.xlabel('$\delta_l $(m)$')
-        plt.ylabel('$Ud_{error}$ $e_{x}$ $(m.s^{-1})$')
+        plt.xlabel('$\delta_l$ (m)')
+        plt.ylabel('$Ud_{x_{error}}$ (m.s$^{-1}$)')
         plt.draw()
         
         plt.subplot(133)
@@ -603,7 +606,7 @@ class Plot_figure_dl_loop :
         plt.axis(self.Fsis_error_axis)
         plt.title('Erreur en vitesse')
         plt.grid(True)
-        plt.xlabel('$\delta_l $(m)$')
-        plt.ylabel('$Fsis_{error}$ $e_{x}$ $(N.m^{-2})$')
+        plt.xlabel('$\delta_l$ (m)')
+        plt.ylabel('$Fsis_{x_{error}}$ (N.m$^{-2}$)')
         plt.draw()
         fg4.savefig(name_fig4,bbox_inches=None)
