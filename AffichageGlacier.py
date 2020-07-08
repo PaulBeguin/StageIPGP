@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## Class for plotting the results
 
 import matplotlib.pyplot as plt

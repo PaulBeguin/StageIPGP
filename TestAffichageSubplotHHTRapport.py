@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 resultsfile0 = "ResultsTestHHT1bloc.npz"
 resultsfile1 = "ResultsTestHHT1bloc2.npz"
 resultsfile2 = "ResultsTestHHT1bloc3.npz"

@@ -10,7 +10,19 @@ import os
 import matplotlib.pyplot as plt
 import time
 
-work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modèle SeismeGlacier1'
+vypath = "/home/vyastreb/PEOPLE/Paul_BEGUIN/GIT/StageIPGP/tmp"
+PC = "VY" 
+
+if PC != "VY":
+    work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modèle SeismeGlacier1'
+    results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results Copy File Npz"
+    save_figure_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Figures Python'
+else:
+    work_path = vypath 
+    results_path = vypath+"/results" 
+    save_path = vypath+"/results" 
+
+
 os.chdir(work_path)
 import SeismeGlacier
 import AffichageGlacier
@@ -21,7 +33,6 @@ import AffichageGlacier
 # ========================= #
 
 # work space and file name for Fc values
-results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results Copy File Npz"
 Fc_filename = 'Fc_clear'
 
 # time array
@@ -100,7 +111,7 @@ np.savez(results_path + '\\' + results_filename,Ut=Ut,Utd=Utd,Utdd=Utdd,Ftf=Ftf,
 
 # récupération de Nt_retour et T_retour
 Fc_note_filename = 'Fc_notes.txt'
-save_figure_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Figures Python'
+
 save_folder_name = SeismeGlacier.create_folder_figure(glacier,save_figure_path,theme_name)
 print("Enregistrement des figures dans fichier " + save_folder_name + "\n")
 

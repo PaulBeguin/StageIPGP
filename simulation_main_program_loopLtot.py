@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ### loop de différent géométrie du glacier
 
 Ltot_list = [5000,10000,20000,40000,80000]
@@ -11,14 +12,22 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import time
-
-work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modèle SeismeGlacier1'
-os.chdir(work_path)
 import SeismeGlacier
 import AffichageGlacier
 
+vypath = "/home/vyastreb/PEOPLE/Paul_BEGUIN/GIT/StageIPGP/tmp"
+PC = "VY" 
+
+if PC != "VY":
+    work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modèle SeismeGlacier1'
+    results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results Copy File Npz\\LoopLtotHHTdl500"
+else:
+    work_path = vypath 
+    results_path = vypath+"/results" 
+
+os.chdir(work_path)
+
 # work space and file name for Fc values
-results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results Copy File Npz\\LoopLtotHHTdl500"
 
 Fc_filename = 'Fc_clear'
 

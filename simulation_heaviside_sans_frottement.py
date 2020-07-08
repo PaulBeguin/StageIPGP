@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ### example de simulation pour retournement iceberg et contact du glacier avec le sol
 
 
@@ -9,8 +10,20 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import time
+import os.path
 
-work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modèle SeismeGlacier sans frottement'
+vypath = "/home/vyastreb/PEOPLE/Paul_BEGUIN/GIT/StageIPGP/tmp"
+PC = "VY" 
+
+if PC != "VY":
+	work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modèle SeismeGlacier sans frottement'
+	results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results Copy File Npz"
+	save_figure_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Figures Python'
+else:
+	work_path = vypath
+	results_path = os.path.join(vypath,"results")
+	save_figure_path = os.path.join(vypath,"results")
+
 os.chdir(work_path)
 import SeismeGlacierSansFrott as SeismeGlacier
 import AffichageGlacierSansFrott as AffichageGlacier
@@ -21,7 +34,6 @@ import AffichageGlacierSansFrott as AffichageGlacier
 # ========================= #
 
 # work space and file name for Fc values
-results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results Copy File Npz"
 Fc_filename = 'Fc_clear'
 
 # time array
@@ -85,7 +97,8 @@ t_end = time.time()
 print("Temps de calcul: " + "%.2f" % (t_end - t_start))
 
 # saving of the results
-np.savez(results_path + '\\' + results_filename,Ut=Ut,Utd=Utd,Utdd=Utdd,Niter_implicite=Niter_implicite)
+np.savez(os.path.join(results_path,results_filename),Ut=Ut,Utd=Utd,Utdd=Utdd,Niter_implicite=Niter_implicite)
+	
 
 
 # ========================= #
@@ -93,7 +106,6 @@ np.savez(results_path + '\\' + results_filename,Ut=Ut,Utd=Utd,Utdd=Utdd,Niter_im
 # ========================= #
 
 # récupération de Nt_retour et T_retour
-save_figure_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Figures Python'
 save_folder_name = SeismeGlacier.create_folder_figure(glacier,save_figure_path,theme_name)
 print("Enregistrement des figures dans fichier " + save_folder_name + "\n")
 

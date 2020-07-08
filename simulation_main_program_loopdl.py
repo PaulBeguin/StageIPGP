@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ### loop de différent géométrie du glacier
 
 Ltot = 5000
@@ -13,13 +14,24 @@ import os
 import matplotlib.pyplot as plt
 import time
 
-work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modèle SeismeGlacier1'
+vypath = "/home/vyastreb/PEOPLE/Paul_BEGUIN/GIT/StageIPGP/tmp"
+PC = "VY" 
+
+if PC != "VY":
+    work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modèle SeismeGlacier1'
+    results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results Copy File Npz\\LoopdlHHTLtot5km"
+    save_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Figures Python'
+else:
+    work_path = vypath 
+    results_path = vypath+"/results" 
+    save_path = vypath+"/results" 
+
+
 os.chdir(work_path)
 import SeismeGlacier
 import AffichageGlacier
 
 # work space and file name for Fc values
-results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results Copy File Npz\\LoopdlHHTLtot5km"
 
 Fc_filename = 'Fc_clear'
 
@@ -101,7 +113,6 @@ np.savez(results_path + '\\' + results_file,U=U_bloc_plot,Ud=Ud_bloc_plot,Fsis=F
 # ======================== #
 
 file_Fcname = 'Fc_notes.txt'
-save_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Figures Python'
 save_folder = '30 juin Test loop dl'
 
 affichage = AffichageGlacier.Plot_figure_dl_loop(file_Fcname,work_path,results_path,results_file,save_path,save_folder,dl_list,Ttot,ud_reg)

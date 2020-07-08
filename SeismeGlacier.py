@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ### Modélisation SetUp1 test 2 implentation 
 #reprise du code main_glacier_test8
 # pour afficher le graphe 2D de la déformation u(x,t)
@@ -407,12 +408,12 @@ def create_folder_figure(glacier,save_figure_path,theme_name):
     os.chdir(save_figure_path)
     folder_list = os.listdir(save_figure_path)
     
-    date = time.asctime(time.localtime())[0:10]
-    save_folder_name = date + " " + theme_name
+    date = time.asctime(time.localtime())[0:10].replace(" ", "_")
+    save_folder_name = date + "_" + theme_name
     
     i=2 
     while save_folder_name in folder_list :
-        save_folder_name = date + " " + theme_name + " V" + str(i)
+        save_folder_name = date + "_" + theme_name + "_V" + str(i)
         i +=1
     
     os.makedirs(save_folder_name)

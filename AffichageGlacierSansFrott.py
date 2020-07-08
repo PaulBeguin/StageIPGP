@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## Class for plotting the results
 
 import matplotlib.pyplot as plt
@@ -58,7 +59,7 @@ class Plot_figures :
     
     def get_result(self):
         
-        file_result = np.load(self.file_path + "\\" + self.file_name )
+        file_result = np.load(os.path.join(self.file_path,self.file_name) )
         self.Ut = file_result['Ut']
         self.Utd = file_result['Utd']
         self.Utdd = file_result['Utdd']
@@ -110,7 +111,7 @@ class Plot_figures :
         #     shutil.rmtree(self.save_folder)
         #     
         # os.makedirs(self.save_folder)
-        os.chdir(self.save_path + '\\' + self.save_folder)
+        os.chdir(os.path.join(self.save_path,self.save_folder))
     
     
     def plot_displacement(self):
