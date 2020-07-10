@@ -11,10 +11,10 @@ import numpy as np
 import os
 import shutil
 
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
-matplotlib.rcParams['figure.figsize'] =10,7
-matplotlib.rcParams.update({'font.size': 40})
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif')
+matplotlib.rcParams['figure.figsize'] =35,18
+matplotlib.rcParams.update({'font.size': 12})
 
 class Plot_figures :
     
@@ -42,7 +42,10 @@ class Plot_figures :
         self.Ud_axis = [0,self.Ttot,-60,20]
         self.F_axis = [0,self.Ttot,-50,50]
         
-    
+        self.title_font = {'size':'20'} 
+        self.label_font = {'size':'20'}
+        self.legend_font = {'size':'15'}
+        
         self.get_Ut_max()
         
         self.get_Fc_note()
@@ -70,7 +73,7 @@ class Plot_figures :
         self.get_save_folder()
         
         self.get_perturbation_Ut()
-        mpl.rcParams['figure.figsize'] = 35,18
+        # mpl.rcParams['figure.figsize'] = 35,18
         
         # self.plot_displacement()
         # self.plot_speed()
@@ -141,9 +144,9 @@ class Plot_figures :
         self.nu_plot = nu_plot_
         self.label_list = label_list_
         
-        label_list_Ud_ = self.label_list
+        label_list_Ud_ = label_list_.copy()
         label_list_Ud_.append("Vitesse d'équilibre")
-        label_list_Ud_.append('Limite de rédularisation')
+        label_list_Ud_.append('Limite de régularisation')
         self.label_list_Ud = label_list_Ud_
         
         self.label_list_F = ['Force de contact','Force sismique','Contact maximal','Retournement complet']
@@ -179,12 +182,11 @@ class Plot_figures :
         plt.legend(self.label_list,ncol=3)
         plt.axis(self.U_axis)
         
-        plt.title('Déplacement total')
+        plt.title('Déplacement total',self.title_font)
         plt.grid(True)
-        plt.xlabel('Temps $t$ (s)')
-        plt.ylabel('$U_x$ (mm)')
-        plt.draw()
-        
+        plt.xlabel('Temps $t$ (s)',self.label_font)
+        plt.ylabel('$U_x$ (mm)',self.label_font)
+
         plt.subplot(122)
         
         for i in range(len(self.nu_plot)):
@@ -199,14 +201,15 @@ class Plot_figures :
         plt.legend(self.label_list,ncol=3)
         plt.axis(self.Up_axis)
         
-        plt.title('Deplacement perturbe')
+        plt.title('Déplacement perturbé',self.title_font)
         plt.grid(True)
-        plt.xlabel('Temps $t$ (s)')
-        plt.ylabel('$U_x$ (mm)')
-        plt.draw()
+        plt.xlabel('Temps $t$ (s)',self.label_font)
+        plt.ylabel('$U_x$ (mm)',self.label_font)
         
+        # plt.show()
+        
+
         fg1.savefig(name_fig1+".svg")
-    
     
     def plot_speed(self):
         
@@ -230,13 +233,13 @@ class Plot_figures :
         ax2.legend(self.label_list_Ud,ncol=3)
         ax2.axis(self.Ud_axis)
         
-        plt.title('Vitesse de perturbation du glacier en fonction du temps')
+        plt.title('Vitesse de perturbation du glacier en fonction du temps',self.title_font)
         ax2.grid(True)
-        plt.xlabel('Temps $t$ (s)')
-        plt.ylabel('$\dot{U}_x$ ($\mu$ m.s$^{-1}$)')
+        plt.xlabel('Temps $t$ (s)',self.label_font)
+        plt.ylabel('$\dot{U}_x$ ($\mu$ m.s$^{-1}$)',self.label_font)
         plt.draw()
         fg2.savefig(name_fig2+'.svg')
-    
+        # fg2.savefig(name_fig2+'.svg')
     
     def plot_strains(self):
         
@@ -252,13 +255,14 @@ class Plot_figures :
         ax3.legend(self.label_list_F,ncol=2)
         ax3.axis(self.F_axis)
         
-        plt.title("Force de contact entre glacier et sol comparee a celle de l'iceberg sur le glacier")
+        plt.title("Force de contact entre glacier et sol comparee a celle de l'iceberg sur le glacier",self.title_font)
         ax3.grid(True)
-        plt.xlabel('Temps $t$ (s)')
-        plt.ylabel('Force $F_x$ (MN.m$^{-1}$)')
+        plt.xlabel('Temps $t$ (s)',self.label_font)
+        plt.ylabel('Force $F_x$ (MN.m$^{-1}$)',self.label_font)
         plt.draw()
         fg3.savefig(name_fig3+'.svg')
-    
+        # fg3.savefig(name_fig3+'.svg')
+
     
     def plot_Niter(self):
         
@@ -268,13 +272,13 @@ class Plot_figures :
         
         ax4.plot(self.T_plot[:-1],self.Niter_implicite)
         
-        plt.title("Nombre d'iterationa chaque pas de temps - schema HHT")
-        plt.xlabel('Instant simule - temps $t$ (s)')
-        plt.ylabel('$N_{iter}$')
+        plt.title("Nombre d'iteration a chaque pas de temps - schema HHT",self.title_font)
+        plt.xlabel('Instant simule - temps $t$ (s)',self.label_font)
+        plt.ylabel('$N_{iter}$',self.label_font)
         plt.grid(True)
         plt.draw()
         fg4.savefig(name_fig4+'.svg')
-    
+        # fg4.savefig(name_fig4+'.svg')
     
     def get_map(self):
         
@@ -305,12 +309,13 @@ class Plot_figures :
         im6 = ax6.pcolormesh(self.T_mesh,self.L_mesh,np.transpose(self.Utp)*1000,shading='gouraud')
         
         fg6.colorbar(im6 , ax=ax6)
-        plt.xlabel('Temps $r$ (s)')
-        plt.ylabel('Position du bloc de glacier $x$ (km)')
-        plt.title('Carte de la perturbation du déplacement(mm) dans le glacier en fonction du temps et de la position du bloc')
+        plt.xlabel('Temps $r$ (s)',self.label_font)
+        plt.ylabel('Position du bloc de glacier $x$ (km)',self.label_font)
+        plt.title('Carte de la perturbation du déplacement(mm) dans le glacier en fonction du temps et de la position du bloc',self.title_font)
         plt.show()
         fg6.savefig(name_fig6+".svg")
-
+        # fg6.savefig(name_fig6+".svg")
+    
     def map_displacement2(self):
         
         name_fig8 = "MapDisplacement2"
@@ -327,12 +332,12 @@ class Plot_figures :
         im8 = ax8.pcolormesh(X2, Y2, data1, cmap='RdBu')
         fg8.colorbar(im8 , ax=ax8)
         
-        plt.xlabel('Temps $t$ (s)')
-        plt.ylabel('Position du bloc de glacier $x$ (km)')
-        plt.title('Carte de la perturbation du deplacement(mm) dans le glacier en fonction du temps et de la position du bloc')
+        plt.xlabel('Temps $t$ (s)',self.label_font)
+        plt.ylabel('Position du bloc de glacier $x$ (km)',self.label_font)
+        plt.title('Carte de la perturbation du deplacement(mm) dans le glacier en fonction du temps et de la position du bloc',self.title_font)
         plt.show()
         fg8.savefig(name_fig8+".svg")
-    
+        # fg8.savefig(name_fig8+".svg")
     
     def map_sismique(self):
         
@@ -343,12 +348,13 @@ class Plot_figures :
         im7 = ax7.pcolormesh(self.T_mesh,self.L_mesh*1e-3,np.transpose(self.Ftsismique_map)*1e-6,shading='gouraud')
         plt.colorbar(im7 , ax=ax7)
         
-        plt.xlabel('Temps $t$ (s)')
-        plt.ylabel('Position du bloc de glacier $x$ (km)')
-        plt.title('Force sismique (MN.m^${-1}$) dans le glacier en fonction du temps et de la position du bloc')
+        plt.xlabel('Temps $t$ (s)',self.label_font)
+        plt.ylabel('Position du bloc de glacier $x$ (km)',self.label_font)
+        plt.title('Force sismique (MN.m^${-1}$) dans le glacier en fonction du temps et de la position du bloc',self.title_font)
         plt.show()
         fg7.savefig(name_fig7+".svg")
-
+        # fg7.savefig(name_fig7+".svg")
+    
 
 class Plot_figure_dl_loop :
     

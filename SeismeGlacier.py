@@ -43,7 +43,7 @@ class Glacier:
 # Initialisation des paramètres d'optimisation
 #   pas d'indice de bloc gardé pour affichage : Np_r
 #   pas d'indice de temps gardé pour affichage : Nt_r
-    def __init__(self,rho_glace,rho_eau,H,alpha_ground,alpha_surface,g,E,Cw,m,Cc,type_law,ef,Np,Ltot,h_im):
+    def __init__(self,rho_glace,rho_eau,H_filename,alpha_ground,alpha_surface,g,E,Cw,m,Cc,type_law,ef,Np,Ltot,h_im):
         
         ## Paramètre de construction physique:
         # paramètres géométrique et physique élémentaires
@@ -64,14 +64,15 @@ class Glacier:
         
         ## Construction élémentaire de la géométrie du glacier et discrétisation
         # discrétisation du glacier
-        self.H=H #épaisseur du glacier
+        self.H_filename=H_filename #file with glacier geometrie
         self.Ltot=Ltot #longueur du glacier
         self.Np=Np #nombre de blocs
         
         ## Setting of the glacier geometrie
         self.l_def()
         self.H_def()
-        
+        self.alpha_def()
+      
         ## Mass matrix and mass of the blocs array
         self.M_bloc_def()
         self.M_def()
@@ -124,14 +125,19 @@ class Glacier:
     ## pression poids composante normale au sol
     def P_zpoids_def(self):
         
-        P_zpoids_ = -np.cos(self.alpha_ground) * self.g * self.M_bloc
+        P_zpoids_ = np.zeros(self.Np+1)
+        for k in range(self.Np+1):
+            P_zpoids_ = -np.cos(self.alpha_l[k]) * self.g * self.M_bloc[k]
         
         self.P_zpoids = P_zpoids_
     
     ## pression poids composante tangentielle au sol - et valeur de frottement sur tout le glacier
     def P_xpoids_def(self):
         
-        P_xpoids_ = -np.sin(self.alpha_ground) * self.g * self.M_bloc
+        P_xpoids_ = np.zeros(self.Np+1)
+        for k in range(self.Np+1):
+            P_xpoids_[k] = -np.sin(self.alpha_l[k]) * self.g * self.M_bloc[k]
+        
         self.F_stat = np.sum(P_xpoids_ )
         
         self.P_xpoids = P_xpoids_ 
@@ -184,18 +190,57 @@ class Glacier:
     ## Heigth of borders 
     def H_def(self):
         
-        Y_down_ = np.zeros(self.Np+2)
-        Y_up_ = np.zeros(self.Np+2)
+        H_file = open(self.H_filename,'r')
+        H_txt = H_file.read()
+        H_file.close()
+        H_line = H_txt.splitlines()
         
-        Y_down_[0] = 0
-        Y_up_[0] = self.H
-        for k in range(1,self.Np+2):
-            Y_down_[k] = np.sin(self.alpha_ground)*self.l[k-1]
-            Y_up_[k] = np.sin(self.alpha_surface)*self.l[k-1] + self.H
+        X_H_list = []
+        Y_down_init = []
+        Y_up_init = []
+        for k in range(len(H_line)):
+            H_line_k = H_line[k].split()
+            if len(H_line_k)>1:
+                X_H_list.append(float(H_line_k[0]))
+                Y_down_init.append(float(H_line_k[1]))
+                Y_up_init.append(float(H_line_k[2]))
         
-        H_ = Y_up_ - Y_down_
+        Y_down_ = [0]
+        Y_up_ = [Y_up_init[0]]
+        
+        ind_k = 0
+        for k in range(self.Np+1):
+            
+            Xk = self.l[k]
+            while Xk < X_H_list[ind_k] and ind_k<len(X_H_list)-1 :
+                ind_k+=1
+            
+            dl_ind_k = X_H_list[ind_k+1] - X_H_list[ind_k]
+            Y_down_k_ = ((Y_down_init[ind_k+1] - Y_down_init[ind_k])/dl_ind_k)*(Xk-X_H_list[ind_k]) + Y_down_init[ind_k]
+            Y_up_k_ = ((Y_up_init[ind_k+1] - Y_up_init[ind_k])/dl_ind_k)*(Xk-X_H_list[ind_k]) + Y_up_init[ind_k]
+            
+            Y_down_.append(Y_down_k_)
+            Y_up_.append(Y_up_k_)
+        
+        self.Y_down = Y_down_
+        self.Y_up = Y_up_
+        
+        H_ = np.zeros(len(self.Y_up))
+        for k in range(len(self.Y_up)):
+            H_[k] = self.Y_up[k] - self.Y_down[k]
+
         self.H_l = H_
+    
+    
+    def alpha_def(self):
         
+        alpha_l_ = np.zeros(self.Np+1)
+        for k in range(self.Np+1):
+            alpha_l_[k] = np.sin((self.Y_down[k+1]-self.Y_down[k])/self.dl_l[k])
+        
+        self.alpha_l = alpha_l_
+    
+    
     ## Mass for each bloc function
     def M_bloc_def(self):
         
@@ -361,6 +406,29 @@ def Fc_lecture(Fc_filename,path,dt,Ttot):
         Fc[k] = (ti1-tk)/dt_init *Fc_init[i] + (tk-ti)/dt_init *Fc_init[i+1]
     
     return(Fc)
+
+
+def Write_H_file_linear(alpha_ground,alpha_surface,Ltot,H0,Nh,H_filename):
+    
+    l_H = np.zeros(Nh+2)
+    dl = Ltot/Nh
+    l_H[1] = dl/2
+    for k in range(1,Nh):
+        l_H[k+1] = l_H[k] + dl
+    l_H[-1] = l_H[Nh] + dl/2
+    
+    H_down = np.sin(alpha_ground)*l_H
+    H_up = np.sin(alpha_surface)*l_H + H0
+    
+    H_txt = ''
+    for k in range(len(H_down)):
+        H_txt += "%.2f"%(l_H[k]) + '  ' + "%.2f" %(H_down[k]) + '  ' + "%.2f" %(H_up[k]) + '\n'
+    
+    file_H = open(H_filename,'w')
+    file_H.write(H_txt)
+    file_H.close()
+    
+    
 
 ## Lecture de valeur dans fichier - Nt_retour et T_retour
 def Value_lecture(Value_filename,type_value,path):

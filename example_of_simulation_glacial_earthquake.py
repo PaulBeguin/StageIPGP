@@ -11,11 +11,11 @@ import matplotlib.pyplot as plt
 import time
 
 vypath = "/home/vyastreb/PEOPLE/Paul_BEGUIN/GIT/StageIPGP/tmp"
-PC = "VY" 
+PC = "PB" 
 
 if PC != "VY":
-    work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modèle SeismeGlacier1'
-    results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results Copy File Npz"
+    work_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Modele_SeismeGlacier1'
+    results_path = "C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Programmes Python\\Results_Copy_File_Npz"
     save_figure_path = 'C:\\Users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Figures Python'
 else:
     work_path = vypath 
@@ -34,6 +34,7 @@ import AffichageGlacier
 
 # work space and file name for Fc values
 Fc_filename = 'Fc_clear'
+H_filename = 'H_glacier'
 
 # time array
 Ttot = 300 
@@ -73,10 +74,12 @@ Np = 20
 
 # Steady sliding
 ud_eq0 = (rho_glace*H*g*np.sin(alpha_ground)/Cw)**(1/m)
-ud_reg = 0.1*ud_eq0
+ud_reg = 0.05*ud_eq0
 
 # Appel class Glacier
-glacier = SeismeGlacier.Glacier(rho_glace,rho_eau,H,alpha_ground,alpha_surface,g,E,Cw,m,Cc,type_law,ud_reg,Np,Ltot,h_im)
+Nh = 2
+SeismeGlacier.Write_H_file_linear(alpha_ground,alpha_surface,Ltot,H,Nh,H_filename)
+glacier = SeismeGlacier.Glacier(rho_glace,rho_eau,H_filename,alpha_ground,alpha_surface,g,E,Cw,m,Cc,type_law,ud_reg,Np,Ltot,h_im)
 
 # For computation process
 theme_name = "Test"
@@ -119,9 +122,9 @@ lu_plot=[0,500,1000,1500,Ltot]
 
 affichage = AffichageGlacier.Plot_figures(results_filename,Fc_note_filename,work_path,results_path,save_figure_path,save_folder_name,lu_plot,Ttot,Ltot,Fc,ud_reg)
 affichage.plot_displacement()
-affichage.plot_speed()
-affichage.plot_strains()
-affichage.plot_Niter()
-affichage.map_displacement()
-# affichage.map_displacement2()
-affichage.map_sismique()
+# affichage.plot_speed()
+# affichage.plot_strains()
+# affichage.plot_Niter()
+# affichage.map_displacement()
+# # affichage.map_displacement2()
+# affichage.map_sismique()
