@@ -55,7 +55,7 @@ T_end = 5
 T_Fp = 2
 
 # discretisation des variables
-dt = 0.1*dl_min*np.sqrt(rho_glace/E)
+dt = 0.01*dl_min*np.sqrt(rho_glace/E)
 Nt = int(T_end/dt) + 1
 T = np.linspace(0,T_end,Nt)
 
@@ -130,7 +130,10 @@ for n in range(Nt-1):
     ms_i = M + mc*C_i + mk*K
     
     ## calcul de glacier.Ff_coul2(un_i,udn_i,udn,Fc[n+1],Adh_last,n) avec glacier.F_result_typelaw2(...)
-    fe_last[1] = -K[1][1]*(u_i[1] - u_last[n+1])
+    fe_last_list = [0]
+    fe_last_list.append(-K[1][1]*(u_i[1] - u_last[n+1]))
+    fe_last = np.array(fe_last_list)
+    
     fe = -np.dot(K,np.transpose(u_i))
     fp_first[0] = fp[n+1]
     
@@ -147,8 +150,9 @@ for n in range(Nt-1):
             print('Test glissement completed au pas :' +str(n) + ' à la première itération')
             if ud_i[0] != 0:
                 sign_last[0] = np.sign(ud_i[0])
-            else :
-                sign_last[0] = np.sign(f_trial_i[0])
+        if f_trial_i[0]*f_trial_n[0] < 0:
+            print('Changement de signe de force')
+            sign_last[0] = np.sign(f_trial_i[0])
     
     ## frottement de Weertman pour le deuxième bloc
     ff_weert_list = [0]
@@ -163,7 +167,8 @@ for n in range(Nt-1):
     p_alpha_t_list = []
     
     if Adh[0] == True : 
-        ff_coul_list.append(f_trial_i[0]*sign_last[0])
+        ff_coul_list.append(-np.abs(f_trial_i[0])*sign_last[0])
+        # ff_coul_list.append(-f_trial_i[0]*sign_last[0])
         p_alpha_t_list.append(0)
     if Adh[0] == False : 
         ff_coul_list.append(-P_gli*sign_last[0])
@@ -207,7 +212,10 @@ for n in range(Nt-1):
         ms_i = M + mc*c_i + mk*K
         
         ## calcul de glacier.Ff_coul2(un_i,udn_i,udn,Fc[n+1],Adh_last,n) avec glacier.F_result_typelaw2(...)
-        fe_last[1] = -K[1][1]*(u_i1[1] - u_last[n+1])
+        fe_last_list = [0]
+        fe_last_list.append(-K[1][1]*(u_i1[1] - u_last[n+1]))
+        fe_last = np.array(fe_last_list)
+        
         fe = -np.dot(K,np.transpose(u_i1))
         fp_first[0] = fp[n+1]
         
@@ -224,8 +232,9 @@ for n in range(Nt-1):
                 Adh[0] = False
                 if ud_i1[0] != 0:
                     sign_last[0] = np.sign(ud_i1[0])
-                else :
-                    sign_last[0] = np.sign(f_trial_i[0])
+            if f_trial_i[0]*f_trial_n[0] < 0:
+                print('Changement de signe de force')
+                sign_last[0] = np.sign(f_trial_i[0])
         
         ## frottement de Weertman pour le deuxième bloc
         ff_weert_list = [0]
@@ -240,7 +249,8 @@ for n in range(Nt-1):
         p_alpha_t = np.zeros(2)
         
         if Adh[0] == True : 
-            ff_alpha_list.append(f_trial_i[0]*sign_last[0])
+            ff_alpha_list.append(-np.abs(f_trial_i[0])*sign_last[0])
+            # ff_alpha_list.append(-f_trial_i[0]*sign_last[0])
             p_alpha_t[0] = 0
         if Adh[0] == False : 
             ff_alpha_list.append(-P_gli*sign_last[0])
@@ -275,6 +285,7 @@ for n in range(Nt-1):
     
     ff = ff_alpha.copy()
     p_n = p_alpha_t.copy()
+    f_trial_n = f_trial_i.copy()
     
     Adh_last = Adh.copy()
     del Adh
@@ -301,7 +312,7 @@ for n in range(Nt-1):
         Niter_implicite.append(i)
         ErrResi.append(en)
 
-save_figure_path = 'C:\\users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Figures Python\\2020_10_19_CoulWeert_2blocs_test_CcTan'
+save_figure_path = 'C:\\users\\Paul Beguin\\Desktop\\Stage IPGP\\Modélisation Glacier Python\\Figures Python\\2020_11_13_Resultats_2blocs'
 os.chdir(save_figure_path)
 
 import matplotlib
@@ -312,7 +323,7 @@ label_font = {'size':'30'}
 
 T_plot = np.linspace(0,T_end,len(U_plot))
 
-Cc_label = 'Tan_init3_dt00314_noNorm'
+Cc_label = 'Fp_dt0000314'
 plt.figure(1)
 plt.plot(T_plot,np.array(U_plot)*1e+3,linewidth=2)
 plt.plot(np.array([T_plot[0],T_plot[-1]]),np.array([u_last[0],u_last[-1]])*1e+3,'b--',linewidth=2)
@@ -323,8 +334,8 @@ plt.title("Déplacement du modèle 2 blocs avec $\mu = tan( alpha ) $",label_fon
 plt.grid(True)
 # plt.axis([0,20,-5,5])
 plt.legend(['Bloc Coulomb','Bloc Weertman','$V_0 .T$'],loc='best')
-plt.savefig('DeplacementTestCc' + Cc_label + '.png')
-plt.savefig('DeplacementTestCc' + Cc_label + '.pdf')
+# plt.savefig('DeplacementTestCc' + Cc_label + '.png')
+plt.savefig('Deplacement_' + Cc_label + '.pdf')
 
 plt.figure(2)
 plt.plot(T_plot,np.array(Ud_plot)*1e+3,linewidth=2)
@@ -336,8 +347,8 @@ plt.title("Vitesse du modèle 2 blocs avec $\mu = tan( alpha ) $",title_font)
 plt.legend(['Bloc Coulomb','Bloc Weertman','$V_0$'],loc='best')
 plt.grid(True)
 # plt.axis([0,20,-5,5])
-plt.savefig('VitesseTestCc' + Cc_label + '.png')
-plt.savefig('VitesseTestCc' + Cc_label + '.pdf')
+# plt.savefig('VitesseTestCc' + Cc_label + '.png')
+plt.savefig('Vitesse_' + Cc_label + '.pdf')
 
 fp_plot_list = []
 for k in range(len(T_plot)):
@@ -358,8 +369,8 @@ plt.ylabel('Force de frottement ($MN/m$)',label_font)
 plt.title("Frottement du modèle 2 blocs avec $\mu = tan( alpha ) $",title_font)
 plt.legend(['Bloc Coulomb','Bloc Weertman','Force de perturbation','Limites $-P_{gli}$ et $P_{gli}$ de glissement'],loc='best')
 plt.grid(True)
-plt.savefig('FrottementTestCc' + Cc_label + '.png')
-plt.savefig('FrottementTestCc' + Cc_label + '.pdf')
+# plt.savefig('FrottementTestCc' + Cc_label + '.png')
+plt.savefig('Frottement_' + Cc_label + '.pdf')
 
 plt.figure(4)
 plt.plot(T_plot[1:],np.array(F_plot)*1e-6,linewidth=2)
@@ -370,5 +381,5 @@ plt.title("Résultante du modèle 2 blocs avec $\mu = tan( alpha ) $",title_font
 plt.grid(True)
 # plt.axis([0,20,-10,10])
 plt.legend(['Bloc Coulomb','Bloc Weertman'],loc='best')
-plt.savefig('ResultanteTestCc' + Cc_label + '.png')
-plt.savefig('ResultanteTestCc' + Cc_label + '.pdf')
+# plt.savefig('ResultanteTestCc' + Cc_label + '.png')
+plt.savefig('Resultante_' + Cc_label + '.pdf')
